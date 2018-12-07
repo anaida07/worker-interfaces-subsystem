@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CodeBuild project for continuous integration
+
+# Note: It's necessary to set up the AWS OAuth application to have access to your repositories.
+# To do it, navigate to the AWS CodeBuild console, create a project and select GitHub as source provider. The project does not need to be saved, it is only important to connect to GitHub. It only needs to be done once.
+
+Parameters:
+  GitRepoUrl:
+    Type: String
+
+  SubSystem:
+    Type: String
+    Description: Subsystem Code (should be all lowercases)
+    AllowedPattern: "^[a-z]+$"
+
+Resources:
+  CodeBuildIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - codebuild.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Policies:
+        - PolicyName: !Join ['-', [!Ref 'AWS::StackName', 'PRCodeBuildRolePolicy']]
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource:
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
+
+  CodeBuildPR:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub ${SubSystem}-pr-code-build
+      Description: CI for Github PRs
+      ServiceRole: !GetAtt CodeBuildIAMRole.Arn
+      Artifacts:
+        Type: no_artifacts
+      Source:
+        Type: GITHUB
+        Auth:
+          Type: OAUTH
+        Location: !Ref GitRepoUrl
+        BuildSpec: Infrastructure/buildspec.yaml
+      Triggers:
+        Webhook: false
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/docker:17.09.0

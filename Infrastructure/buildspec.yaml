@@ -1,0 +1,13 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo "CODEBUILD_RESOLVED_SOURCE_VERSION is ${CODEBUILD_RESOLVED_SOURCE_VERSION}"
+      - COMMIT="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+      - echo "Current Git commit is ${COMMIT}"
+      - echo "Trigger event is ${CODEBUILD_WEBHOOK_TRIGGER}"
+  build:
+    commands:
+      - echo "Starting test ..."
+      - make test
+      - echo "Test Complete for subsystem at ${COMMIT}"

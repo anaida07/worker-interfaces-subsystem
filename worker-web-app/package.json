@@ -1,0 +1,25 @@
+{
+  "name": "worker-web-app",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "amazon-cognito-identity-js": "3.0.3",
+    "body-parser": "^1.18.3",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.3",
+    "express": "^4.16.4",
+    "express-flash": "git://github.com/RGBboy/express-flash.git",
+    "express-session": "^1.15.6",
+    "express-validator": "^5.3.0",
+    "fs": "0.0.1-security",
+    "morgan": "^1.9.1",
+    "node-fetch": "^2.3.0",
+    "pug": "~2.0.0-beta11",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2",
+    "serve-favicon": "~2.4.2"
+  }
+}
